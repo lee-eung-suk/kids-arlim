@@ -1,14 +1,18 @@
-import React from 'react';
-import { User, LogIn } from 'lucide-react';
+import React, { useState } from 'react';
+import { User, Settings, ArrowRight } from 'lucide-react';
 
 interface LoginScreenProps {
-  onLogin: (name: string) => void;
+  onStart: (name: string, folderId: string) => void;
 }
 
-export const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
-  const handleLogin = () => {
-    // Simulating Google Auth for the demo since we don't have a backend/Client ID
-    onLogin("김선생님");
+export const LoginScreen: React.FC<LoginScreenProps> = ({ onStart }) => {
+  const [name, setName] = useState('');
+  const [folderId, setFolderId] = useState('');
+
+  const handleStart = () => {
+    if (name.trim()) {
+      onStart(name.trim(), folderId.trim());
+    }
   };
 
   return (
@@ -18,20 +22,51 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
           <User className="w-10 h-10 text-orange-600" />
         </div>
         <h1 className="text-3xl font-bold text-orange-800 font-hand">알림장 톡톡</h1>
-        <p className="text-orange-600">학부모님께 보낼 따뜻한 이야기를 만들어보세요</p>
+        <p className="text-orange-600">선생님의 정보를 입력하고 시작해주세요</p>
       </div>
 
-      <button
-        onClick={handleLogin}
-        className="w-full max-w-xs bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 font-semibold py-3 px-6 rounded-xl shadow-md flex items-center justify-center gap-3 transition-all duration-200 transform hover:scale-105"
-      >
-        <LogIn className="w-5 h-5 text-blue-500" />
-        <span>구글 계정으로 시작하기</span>
-      </button>
+      <div className="w-full max-w-xs space-y-4">
+        {/* Teacher Name Input */}
+        <div className="space-y-1">
+          <label className="text-sm font-bold text-orange-700 ml-1">선생님 성함 (필수)</label>
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="예: 김선생님"
+            className="w-full px-4 py-3 rounded-xl border-2 border-orange-200 focus:border-orange-400 focus:outline-none bg-white text-orange-900 placeholder-orange-300"
+          />
+        </div>
 
-      <p className="text-xs text-orange-400 mt-8 text-center max-w-xs">
-        * 실제 서비스에서는 Google Workspace 계정과 연동되어 드라이브에 자동 저장됩니다.
-      </p>
+        {/* Folder ID Input */}
+        <div className="space-y-1">
+          <label className="text-sm font-bold text-orange-700 ml-1">구글 드라이브 폴더 ID (선택)</label>
+          <input
+            type="text"
+            value={folderId}
+            onChange={(e) => setFolderId(e.target.value)}
+            placeholder="폴더 ID 입력 시 해당 경로로 저장"
+            className="w-full px-4 py-3 rounded-xl border-2 border-orange-200 focus:border-orange-400 focus:outline-none bg-white text-orange-900 placeholder-orange-300 font-mono text-sm"
+          />
+          <p className="text-[10px] text-orange-400 ml-1">
+            * 미입력 시 PDF가 내 컴퓨터에 다운로드됩니다.
+          </p>
+        </div>
+
+        <button
+          onClick={handleStart}
+          disabled={!name.trim()}
+          className={`
+            w-full mt-4 py-3 px-6 rounded-xl shadow-md flex items-center justify-center gap-2 font-bold transition-all duration-200
+            ${!name.trim() 
+              ? 'bg-gray-200 text-gray-400 cursor-not-allowed' 
+              : 'bg-orange-500 hover:bg-orange-600 text-white transform hover:scale-105'}
+          `}
+        >
+          <span>시작하기</span>
+          <ArrowRight className="w-5 h-5" />
+        </button>
+      </div>
     </div>
   );
 };

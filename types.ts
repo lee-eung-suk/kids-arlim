@@ -13,6 +13,7 @@ export enum AppStep {
 export interface UserState {
   isLoggedIn: boolean;
   teacherName: string;
+  folderId?: string;
 }
 
 export interface ActivityData {

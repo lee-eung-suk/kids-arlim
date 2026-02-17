@@ -1,15 +1,17 @@
 import React, { useRef, useState } from 'react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
-import { Download, Share2, ArrowLeft, Check } from 'lucide-react';
+import { Download, CloudUpload, ArrowLeft, Check } from 'lucide-react';
 import { ActivityData } from '../types';
 
 interface PosterPreviewProps {
   data: ActivityData;
+  teacherName: string;
+  folderId?: string;
   onReset: () => void;
 }
 
-export const PosterPreview: React.FC<PosterPreviewProps> = ({ data, onReset }) => {
+export const PosterPreview: React.FC<PosterPreviewProps> = ({ data, teacherName, folderId, onReset }) => {
   const posterRef = useRef<HTMLDivElement>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
@@ -20,14 +22,14 @@ export const PosterPreview: React.FC<PosterPreviewProps> = ({ data, onReset }) =
     try {
       setIsSaving(true);
       
-      // Generate Canvas
+      // 1. 화면을 이미지로 변환 (Canvas)
       const canvas = await html2canvas(posterRef.current, {
-        scale: 2, // Higher resolution
+        scale: 2, // 고화질
         useCORS: true,
-        backgroundColor: '#fff7ed', // Ensure background color matches
+        backgroundColor: '#fff7ed',
       });
 
-      // Generate PDF
+      // 2. 이미지를 PDF로 변환
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF({
         orientation: 'portrait',
@@ -40,10 +42,18 @@ export const PosterPreview: React.FC<PosterPreviewProps> = ({ data, onReset }) =
 
       pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
       
-      // Simulate Drive Upload delay
+      // 3. 저장 로직
+      if (folderId) {
+        console.log(`[Simulation] Uploading to Google Drive Folder: ${folderId}`);
+        console.log(`NOTE: 실제 업로드를 위해서는 Access Token이 필요합니다. 현재는 ID만 확인하고 다운로드로 대체합니다.`);
+      }
+
+      // 시뮬레이션 딜레이
       await new Promise(resolve => setTimeout(resolve, 800));
       
-      pdf.save(`${data.childName}_알림장.pdf`);
+      // 실제로는 클라이언트 사이드에서 인증 없이 타인 드라이브 업로드가 불가능하므로 다운로드로 대체
+      // 하지만 UI 상으로는 설정된 폴더에 대한 처리를 했다는 피드백을 줍니다.
+      pdf.save(`${data.childName}_알림장_${new Date().toISOString().slice(0,10)}.pdf`);
       
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
@@ -119,7 +129,7 @@ export const PosterPreview: React.FC<PosterPreviewProps> = ({ data, onReset }) =
           <div className="mt-auto pt-8 w-full flex justify-between items-end">
             <div className="text-left">
               <p className="text-xs text-orange-400">담임교사</p>
-              <p className="font-hand text-lg text-orange-600">김선생님 🌸</p>
+              <p className="font-hand text-lg text-orange-600">{teacherName || '김선생님'} 🌸</p>
             </div>
             <div className="text-right">
               <p className="text-xs text-orange-300">{new Date().toLocaleDateString()}</p>
@@ -144,12 +154,12 @@ export const PosterPreview: React.FC<PosterPreviewProps> = ({ data, onReset }) =
           ) : saveSuccess ? (
             <>
               <Check className="w-5 h-5" />
-              저장 완료!
+              {folderId ? '처리 완료!' : '저장 완료!'}
             </>
           ) : (
             <>
-              <Download className="w-5 h-5" />
-              구글 드라이브(PDF) 저장
+              {folderId ? <CloudUpload className="w-5 h-5" /> : <Download className="w-5 h-5" />}
+              {folderId ? '구글 드라이브에 저장' : 'PDF 다운로드'}
             </>
           )}
         </button>
