@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
+import { jsPDF } from 'jspdf';
 import { Download, CloudUpload, ArrowLeft, Check } from 'lucide-react';
 import { ActivityData } from '../types';
 
