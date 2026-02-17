@@ -1,0 +1,7 @@
+{
+  "name": "Kindergarten Momento",
+  "description": "A warm and simple tool for teachers to generate AI-powered activity updates for parents.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
